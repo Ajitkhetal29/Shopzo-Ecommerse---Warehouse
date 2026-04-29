@@ -1,0 +1,34 @@
+import axios from "axios";
+import { API_ENDPOINTS } from "@/lib/api";
+
+type UploadType = "transferIssue";
+
+type UploadExtra = {
+  transferId?: string;
+};
+
+export async function uploadFilesToS3(files: File[], type: UploadType, extra: UploadExtra = {}) {
+  if (!files.length) return [];
+
+  const uploadedUrls: string[] = [];
+
+  for (const file of files) {
+    const { data } = await axios.post(
+      API_ENDPOINTS.GENERATE_UPLOAD_URL,
+      { fileName: file.name, fileType: file.type, type, ...extra },
+      { withCredentials: true }
+    );
+
+    if (!data?.success) {
+      throw new Error(data?.message || "Failed to generate upload URL");
+    }
+
+    await axios.put(data.uploadUrl, file, {
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+    });
+
+    uploadedUrls.push(data.fileUrl as string);
+  }
+
+  return uploadedUrls;
+}

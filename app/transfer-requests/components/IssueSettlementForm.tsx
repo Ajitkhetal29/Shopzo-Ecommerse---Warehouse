@@ -23,6 +23,7 @@ export type SettlementRow = {
   mixMissing: boolean;
   mixExtra: boolean;
   damagedImages: string[];
+  damagedFiles: File[];
 };
 
 export type SettlementField =
@@ -32,7 +33,8 @@ export type SettlementField =
   | "missingQuantity"
   | "extraQuantity"
   | "issueType"
-  | "damagedImages";
+  | "damagedImages"
+  | "damagedFiles";
 
 type IssueSettlementFormProps = {
   show: boolean;
@@ -91,7 +93,7 @@ const IssueSettlementForm = ({
       if (url.startsWith("blob:")) URL.revokeObjectURL(url);
     });
     const previews = files ? Array.from(files).map((f) => URL.createObjectURL(f)) : [];
-    onChangeRow(idx, { damagedImages: previews });
+    onChangeRow(idx, { damagedImages: previews, damagedFiles: files ? Array.from(files) : [] });
   };
 
   const renderQtySelect = (
@@ -189,6 +191,7 @@ const IssueSettlementForm = ({
                             missingQuantity: "0",
                             extraQuantity: "0",
                             damagedImages: [],
+                            damagedFiles: [],
                           });
                         }}
                       >
@@ -251,6 +254,7 @@ const IssueSettlementForm = ({
                                       mixDamaged: e.target.checked,
                                       damagedQuantity: e.target.checked ? (row.damagedQuantity || "1") : "0",
                                       damagedImages: e.target.checked ? row.damagedImages : [],
+                                      damagedFiles: e.target.checked ? row.damagedFiles : [],
                                     })
                                   }
                                 />

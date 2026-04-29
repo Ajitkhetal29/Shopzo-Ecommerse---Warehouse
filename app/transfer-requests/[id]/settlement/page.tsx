@@ -13,6 +13,7 @@ import IssueSettlementForm, {
   SettlementRow,
 } from "../../components/IssueSettlementForm";
 import { buildSettlementPayload, validateSettlement } from "../../components/settlement-utils";
+import { uploadFilesToS3 } from "@/lib/s3Upload";
 
 type TransferVariant = { _id: string; sku?: string };
 type TransferParty = { _id: string; name: string };
@@ -80,6 +81,7 @@ const SettlementPage = () => {
           mixMissing: false,
           mixExtra: false,
           damagedImages: [],
+          damagedFiles: [],
         }));
 
         if (isCompletedMode) {
@@ -124,6 +126,7 @@ const SettlementPage = () => {
       missingQuantity: "0",
       extraQuantity: "0",
       damagedImages: [],
+      damagedFiles: [],
     };
   };
 
@@ -149,6 +152,23 @@ const SettlementPage = () => {
         mode === "completed"
           ? API_ENDPOINTS.COMPLETE_INVENTORY_TRANSFER
           : API_ENDPOINTS.ISSUE_REPORT_INVENTORY_TRANSFER;
+
+      const preparedRows =
+        mode === "issue_reported"
+          ? await Promise.all(
+              rows.map(async (row) => {
+                if (!row.damagedFiles?.length) return row;
+                const uploaded = await uploadFilesToS3(row.damagedFiles, "transferIssue", {
+                  transferId: transfer._id,
+                });
+                return {
+                  ...row,
+                  damagedImages: uploaded,
+                };
+              })
+            )
+          : rows;
+
       const payload =
         mode === "completed"
           ? {
@@ -160,7 +180,7 @@ const SettlementPage = () => {
               transferId: transfer._id,
               userType: "warehouse",
               userId: warehouse._id,
-              items: buildSettlementPayload(rows),
+              items: buildSettlementPayload(preparedRows),
             };
 
       const res = await axios.patch(endpoint, payload, { withCredentials: true });

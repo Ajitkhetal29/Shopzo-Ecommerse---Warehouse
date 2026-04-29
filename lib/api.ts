@@ -17,6 +17,9 @@ export const API_ENDPOINTS = {
   COMPLETE_INVENTORY_TRANSFER: `${API_BASE_URL}/inventoryTransfer/complete`,
   ISSUE_REPORT_INVENTORY_TRANSFER: `${API_BASE_URL}/inventoryTransfer/issue-report`,
   GET_TRANSFER_ISSUES: `${API_BASE_URL}/inventoryTransfer/issues`,
+  GET_TRANSFER_ISSUE_RESOLUTION_RULES: `${API_BASE_URL}/inventoryTransfer/issue-resolution-rules`,
+  UPDATE_TRANSFER_ISSUE_STATUS: `${API_BASE_URL}/inventoryTransfer/issues/status`,
+  GENERATE_UPLOAD_URL: `${API_BASE_URL}/upload/generate-upload-url`,
 
 
 // inventory
