@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  basePath: "/warehouse",
+  assetPrefix: "/warehouse",
+  turbopack: {
+    root: projectRoot,
+  },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "**.amazonaws.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+    ],
+  },
 };
 
 export default nextConfig;

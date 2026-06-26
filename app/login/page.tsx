@@ -1,17 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { API_ENDPOINTS } from "@/lib/api";
+import { RootState } from "@/store";
 import { setWarehouse } from "@/store/slices/authSlice";
+import ThemeToggleButton from "@/app/components/ThemeToggleButton";
+import { publicUrl } from "@/lib/basePath";
 
 type LoginMode = "mobile" | "email";
 
 const LoginPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const warehouse = useSelector((state: RootState) => state.auth.warehouse);
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,6 +27,10 @@ const LoginPage = () => {
     contactNumber: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (warehouse) router.push("/dashboard");
+  }, [warehouse, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +43,7 @@ const LoginPage = () => {
           ? { contactNumber: formData.contactNumber, password: formData.password }
           : { email: formData.email, password: formData.password };
 
-      const res = await axios.post(API_ENDPOINTS.LOGIN, payload, {
-        withCredentials: true,
-      });
+      const res = await axios.post(API_ENDPOINTS.LOGIN, payload, { withCredentials: true });
 
       if (!res.data?.success || !res.data?.warehouse) {
         setError(res.data?.message || "Login failed");
@@ -64,133 +72,227 @@ const LoginPage = () => {
     }
   };
 
+  const inputClass =
+    "h-11 w-full max-w-full rounded-xl border border-slate-200 bg-white px-4 text-[0.95rem] text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-amber-500/60 focus:ring-2 focus:ring-amber-500/25 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-amber-500/50 dark:focus:ring-amber-500/20";
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-black mb-2">
-          Warehouse Login
-        </h1>
-        <p className="text-gray-600 text-center mb-6">
-          Sign in to your Shopzo warehouse account
-        </p>
+    <div className="relative min-h-dvh overflow-x-hidden bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_58%_40%_at_20%_15%,rgba(245,158,11,0.12),transparent),radial-gradient(ellipse_42%_34%_at_85%_90%,rgba(14,165,233,0.08),transparent)] dark:bg-[radial-gradient(ellipse_58%_40%_at_20%_15%,rgba(245,158,11,0.1),transparent),radial-gradient(ellipse_42%_34%_at_85%_90%,rgba(14,165,233,0.06),transparent)]"
+        aria-hidden
+      />
 
-        <div className="mb-4 grid grid-cols-2 rounded-lg border border-gray-200 p-1">
-          <button
-            type="button"
-            onClick={() => {
-              setLoginMode("mobile");
-              setError("");
-            }}
-            className={`rounded-md py-2 text-sm font-medium transition-colors ${
-              loginMode === "mobile"
-                ? "bg-black text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            Mobile Number
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setLoginMode("email");
-              setError("");
-            }}
-            className={`rounded-md py-2 text-sm font-medium transition-colors ${
-              loginMode === "email"
-                ? "bg-black text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            Email
-          </button>
-        </div>
+      <ThemeToggleButton
+        className={[
+          "fixed right-4 top-4 z-20 rounded-full border p-2.5 shadow-sm backdrop-blur-sm",
+          "border-slate-200/90 bg-white/95 text-slate-600 hover:bg-slate-50",
+          "dark:border-slate-700/80 dark:bg-slate-900/95 dark:text-amber-200/90 dark:hover:bg-slate-800/95",
+        ].join(" ")}
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {loginMode === "mobile" ? (
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">
-                Contact Number
-              </label>
-              <input
-                name="contactNumber"
-                type="text"
-                required
-                value={formData.contactNumber}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    contactNumber: e.target.value,
-                  }));
-                  setError("");
-                }}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-black bg-white focus:ring-2 focus:ring-black transition-colors"
-              />
-            </div>
-          ) : (
-            <div>
-              <label className="block text-sm font-medium text-black mb-1">
-                Email
-              </label>
-              <input
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  }));
-                  setError("");
-                }}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-black bg-white focus:ring-2 focus:ring-black transition-colors"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-black mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                value={formData.password}
-                onChange={(e) => {
-                  setFormData((prev) => ({ ...prev, password: e.target.value }));
-                  setError("");
-                }}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-black bg-white focus:ring-2 focus:ring-black transition-colors"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-2 text-gray-500"
-              >
-                {showPassword ? "🙈" : "👁"}
-              </button>
-            </div>
+      <div className="relative z-[1] grid min-h-dvh grid-cols-1 lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="relative hidden border-r border-slate-200/80 bg-white/70 p-12 backdrop-blur lg:flex lg:flex-col lg:justify-between dark:border-slate-800/80 dark:bg-slate-900/50">
+          <div className="max-w-lg">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-600 dark:text-amber-300">Shopzo Warehouse</p>
+            <h1 className="mt-4 text-5xl font-semibold leading-[1.05] tracking-tight text-slate-900 dark:text-white">
+              Fulfill faster
+              <span className="mt-3 block text-2xl font-medium text-slate-500 dark:text-slate-300">
+                with your warehouse workspace
+              </span>
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-slate-600 dark:text-slate-400">
+              Manage stock, transfers, and inbound/outbound operations from one operations console.
+            </p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg">
-              {error}
-            </div>
-          )}
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Fulfillment Console</p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              Inventory control, transfer workflows, and issue resolution for warehouse teams.
+            </p>
+          </div>
+        </section>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+        <section className="flex items-center justify-center px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+          <div className="w-full max-w-[430px] rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-7 dark:border-slate-700/80 dark:bg-slate-900/95">
+            <div className="mb-6 flex justify-center">
+              <div className="relative h-14 w-[10.5rem] overflow-hidden sm:h-16 sm:w-[12rem]">
+                <Image
+                  src={publicUrl("/shopzo_logo.png")}
+                  alt="Shopzo"
+                  fill
+                  sizes="(max-width: 640px) 168px, 192px"
+                  className="object-contain object-center scale-[1.55] dark:hidden"
+                  priority
+                />
+                <Image
+                  src={publicUrl("/shopzo_logo_tp.png")}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 168px, 192px"
+                  className="hidden object-contain object-center scale-[1.55] dark:block"
+                  priority
+                  aria-hidden
+                />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                Welcome back
+              </p>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">Sign in</h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Mobile or email with password</p>
+            </div>
+
+            <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800/80">
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginMode("mobile");
+                  setError("");
+                }}
+                className={`rounded-lg py-2 text-sm font-medium transition-colors ${
+                  loginMode === "mobile"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700"
+                }`}
+              >
+                Mobile
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginMode("email");
+                  setError("");
+                }}
+                className={`rounded-lg py-2 text-sm font-medium transition-colors ${
+                  loginMode === "email"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700"
+                }`}
+              >
+                Email
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              {loginMode === "mobile" ? (
+                <div>
+                  <label htmlFor="login-mobile" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                    Contact number
+                  </label>
+                  <input
+                    id="login-mobile"
+                    name="contactNumber"
+                    type="text"
+                    required
+                    value={formData.contactNumber}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, contactNumber: e.target.value }));
+                      setError("");
+                    }}
+                    className={inputClass}
+                    placeholder="+91…"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                    Email
+                  </label>
+                  <input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, email: e.target.value }));
+                      setError("");
+                    }}
+                    className={inputClass}
+                    placeholder="you@warehouse.com"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="login-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={formData.password}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, password: e.target.value }));
+                      setError("");
+                    }}
+                    className={`${inputClass} pr-12`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {error ? (
+                <div
+                  className="rounded-xl border border-red-200/80 bg-red-50/90 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+                  role="alert"
+                >
+                  {error}
+                </div>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="h-11 w-full rounded-xl bg-amber-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:ring-offset-2 focus:ring-offset-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-slate-900"
+              >
+                {loading ? "Signing in…" : "Sign in"}
+              </button>
+            </form>
+
+            <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-400">Authorized warehouse access only.</p>
+          </div>
+        </section>
       </div>
     </div>
   );
 };
+
+function EyeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  );
+}
+
+function EyeOffIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+      />
+    </svg>
+  );
+}
 
 export default LoginPage;
