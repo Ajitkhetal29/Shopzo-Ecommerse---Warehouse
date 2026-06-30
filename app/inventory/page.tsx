@@ -81,114 +81,96 @@ export default function InventoryPage() {
 
   if (loading && rows.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-slate-900">
-        <div className="text-lg text-gray-600 dark:text-gray-400">Loading...</div>
+      <div className="flex items-center justify-center py-24">
+        <p className="text-sm font-medium text-shop-muted">Loading inventory...</p>
       </div>
     );
   }
 
   if (error && rows.length === 0) {
     return (
-      <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
-        <div className="max-w-7xl mx-auto bg-red-100 dark:bg-red-900/20 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded">
-          Error: {error}
-        </div>
+      <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
+        {error}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-8 px-4 sm:px-6 lg:px-8 transition-colors">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
-            Inventory
-          </h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Available = sellable · Damaged / extra hold are not sellable until resolved
-          </p>
-        </div>
-
-        {error ? (
-          <div className="mb-4 bg-red-100 dark:bg-red-900/20 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded">
-            {error}
-          </div>
-        ) : null}
-
-        {rows.length === 0 && !loading ? (
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-12 text-center">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-              No inventory
-            </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Nothing on this page.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 text-sm">
-              <thead className="bg-gray-50 dark:bg-slate-700/80">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    SKU
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Variant
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Available
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Reserved
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Missing
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Damaged
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Extra hold
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                {rows.map((row) => (
-                  <tr key={row._id} className="hover:bg-gray-50 dark:hover:bg-slate-700/30">
-                    <td className="px-4 py-3 font-mono text-gray-900 dark:text-white">
-                      {row.variant?.sku || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white">
-                      {row.variant?.name || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-gray-900 dark:text-white">
-                      {sellableAvailable(row)}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                      {row.reserved || 0}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-amber-700 dark:text-amber-400">
-                      {row.missingHold ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-orange-700 dark:text-orange-400">
-                      {row.damagedQty ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-violet-700 dark:text-violet-400">
-                      {row.extraHold ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-gray-900 dark:text-white">
-                      {row.quantity || 0}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Inventory</h1>
+        <p className="mt-1 text-sm text-shop-muted">
+          Available = sellable · Damaged / extra hold are not sellable until resolved
+        </p>
       </div>
+
+      {error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
+          {error}
+        </div>
+      ) : null}
+
+      {rows.length === 0 && !loading ? (
+        <div className="rounded-2xl border border-shop-border bg-shop-surface-raised p-12 text-center">
+          <h3 className="text-sm font-medium text-foreground">No inventory</h3>
+          <p className="mt-1 text-sm text-shop-muted">Nothing on this page.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-shop-border bg-shop-surface-raised">
+          <table className="min-w-full divide-y divide-shop-border text-sm">
+            <thead className="bg-shop-surface">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  SKU
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Variant
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Available
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Reserved
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Missing
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Damaged
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Extra hold
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-shop-muted">
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-shop-border">
+              {rows.map((row) => (
+                <tr key={row._id} className="hover:bg-shop-surface">
+                  <td className="px-4 py-3 font-mono text-foreground">{row.variant?.sku || "-"}</td>
+                  <td className="px-4 py-3 text-foreground">{row.variant?.name || "-"}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-foreground">
+                    {sellableAvailable(row)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-shop-muted">{row.reserved || 0}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-amber-700 dark:text-amber-400">
+                    {row.missingHold ?? 0}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-orange-700 dark:text-orange-400">
+                    {row.damagedQty ?? 0}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-violet-700 dark:text-violet-400">
+                    {row.extraHold ?? 0}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-foreground">{row.quantity || 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
