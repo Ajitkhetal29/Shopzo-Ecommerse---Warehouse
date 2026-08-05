@@ -24,4 +24,7 @@ export const API_ENDPOINTS = {
 
 // inventory
   GET_INVENTORY: `${API_BASE_URL}/inventory/list`,
+
+  GET_FULFILLMENTS: `${API_BASE_URL}/fulfillment/list`,
+  UPDATE_FULFILLMENT_STATUS: `${API_BASE_URL}/fulfillment`,
 };
