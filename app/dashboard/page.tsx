@@ -1,14 +1,19 @@
 "use client";
 
+import axios from "axios";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { API_ENDPOINTS } from "@/lib/api";
 import { whCard, whPageHeader, whSubtitle, whTitle } from "@/lib/warehouse-ui";
+import { RootState } from "@/store";
 
-const STATS = [
-  { name: "Transfer Requests", value: "0", icon: "🔁", href: "/transfer-requests", iconWrap: "bg-sky-100 dark:bg-sky-500/20" },
-  { name: "Inventory SKUs", value: "0", icon: "📦", href: "/inventory", iconWrap: "bg-emerald-100 dark:bg-emerald-500/20" },
-  { name: "Open Orders", value: "0", icon: "🧾", href: "/orders", iconWrap: "bg-amber-100 dark:bg-amber-500/20" },
-  { name: "Activity Logs", value: "0", icon: "📝", href: "/activity", iconWrap: "bg-violet-100 dark:bg-violet-500/20" },
-];
+type DashboardStats = {
+  openCount?: number;
+  inventorySkus?: number;
+  pendingTransfers?: number;
+  openIssues?: number;
+};
 
 const QUICK_ACTIONS = [
   { name: "Transfer Requests", href: "/transfer-requests", icon: "🔁" },
@@ -19,6 +24,56 @@ const QUICK_ACTIONS = [
 ];
 
 export default function DashboardPage() {
+  const warehouse = useSelector((state: RootState) => state.auth.warehouse);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+
+  useEffect(() => {
+    if (!warehouse?._id) return;
+    let cancelled = false;
+    axios
+      .get(API_ENDPOINTS.GET_FULFILLMENT_STATS, { withCredentials: true })
+      .then((res) => {
+        if (!cancelled && res.data?.success) setStats(res.data.data || {});
+      })
+      .catch(() => {
+        if (!cancelled) setStats({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [warehouse?._id]);
+
+  const cards = [
+    {
+      name: "Transfer Requests",
+      value: String(stats?.pendingTransfers ?? "—"),
+      icon: "🔁",
+      href: "/transfer-requests",
+      iconWrap: "bg-sky-100 dark:bg-sky-500/20",
+    },
+    {
+      name: "Inventory SKUs",
+      value: String(stats?.inventorySkus ?? "—"),
+      icon: "📦",
+      href: "/inventory",
+      iconWrap: "bg-emerald-100 dark:bg-emerald-500/20",
+    },
+    {
+      name: "Open Orders",
+      value: String(stats?.openCount ?? "—"),
+      icon: "🧾",
+      href: "/orders",
+      iconWrap: "bg-amber-100 dark:bg-amber-500/20",
+    },
+    {
+      name: "Open Issues",
+      value: String(stats?.openIssues ?? "—"),
+      icon: "📝",
+      href: "/transfer-issues",
+      iconWrap: "bg-violet-100 dark:bg-violet-500/20",
+    },
+  ];
+
   return (
     <div className="space-y-6 sm:space-y-7">
       <div className={whPageHeader}>
@@ -29,7 +84,7 @@ export default function DashboardPage() {
       <div>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-shop-muted">Key metrics</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((stat) => (
+          {cards.map((stat) => (
             <Link
               key={stat.name}
               href={stat.href}
@@ -67,14 +122,6 @@ export default function DashboardPage() {
               <span className="text-sm font-semibold text-foreground">{action.name}</span>
             </Link>
           ))}
-        </div>
-      </div>
-
-      <div className={`${whCard} p-5 sm:p-6`}>
-        <h2 className="text-xl font-semibold tracking-tight text-foreground">Recent activity</h2>
-        <p className="mb-4 mt-1 text-sm text-shop-muted">Latest warehouse operations</p>
-        <div className="rounded-xl border border-dashed border-shop-border py-14 text-center">
-          <p className="text-sm font-medium text-shop-muted">No recent activity to display</p>
         </div>
       </div>
     </div>
