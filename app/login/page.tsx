@@ -282,7 +282,10 @@ const LoginPage = () => {
             </div>
 
             <p className="mt-6 text-center text-sm text-slate-600 dark:text-zinc-400">
-              Authorized warehouse access only.
+              New warehouse?{" "}
+              <Link href="/register" className="font-semibold text-slate-950 dark:text-white">
+                Register and wait for approval
+              </Link>
             </p>
           </div>
         </section>

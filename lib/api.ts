@@ -6,6 +6,7 @@ if (!API_BASE_URL) {
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/warehouse/login`,
+  REGISTER: `${API_BASE_URL}/warehouse/register`,
   LOGOUT: `${API_BASE_URL}/warehouse/logout`,
   CURRENT_USER: `${API_BASE_URL}/warehouse/me`,
 
@@ -26,6 +27,7 @@ export const API_ENDPOINTS = {
   GET_INVENTORY: `${API_BASE_URL}/inventory/list`,
 
   GET_FULFILLMENTS: `${API_BASE_URL}/fulfillment/list`,
+  GET_FULFILLMENT_BY_ID: `${API_BASE_URL}/fulfillment`,
   GET_FULFILLMENT_STATS: `${API_BASE_URL}/fulfillment/stats`,
   UPDATE_FULFILLMENT_STATUS: `${API_BASE_URL}/fulfillment`,
 };

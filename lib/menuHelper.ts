@@ -4,5 +4,5 @@ export const WAREHOUSE_MENU_ITEMS = [
   { label: "Transfer Inventory", href: "/transfer-requests" },
   { label: "Transfer Issues", href: "/transfer-issues" },
   { label: "Orders", href: "/orders" },
-  { label: "History", href: "/activity" },
+  { label: "Order history", href: "/activity" },
 ];

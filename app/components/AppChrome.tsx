@@ -16,11 +16,11 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   const warehouse = useSelector((s: RootState) => s.auth.warehouse);
 
-  const isLogin = pathname === "/login";
-  const [isVerifying, setIsVerifying] = useState(!isLogin);
+  const isPublic = pathname === "/login" || pathname === "/register";
+  const [isVerifying, setIsVerifying] = useState(!isPublic);
 
   useEffect(() => {
-    if (isLogin) {
+    if (isPublic) {
       setIsVerifying(false);
       return;
     }
@@ -61,7 +61,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, [dispatch, isLogin, router, warehouse]);
+  }, [dispatch, isPublic, router, warehouse]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -73,7 +73,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
     router.push("/login");
   }, [dispatch, router]);
 
-  if (isLogin) {
+  if (isPublic) {
     return <>{children}</>;
   }
 
