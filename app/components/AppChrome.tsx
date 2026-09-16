@@ -44,6 +44,7 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
               name: res.data.warehouse.name,
               email: res.data.warehouse.email,
               contactNumber: res.data.warehouse.contactNumber,
+              location: res.data.warehouse.location,
               address: res.data.warehouse.address,
               isActive: res.data.warehouse.isActive,
             }),

@@ -5,12 +5,17 @@ export type Warehouse = {
   name: string;
   email?: string;
   contactNumber?: string;
+  location?: { lat: number; lng: number };
   address?: {
     formatted?: string;
+    line1?: string;
     city?: string;
     state?: string;
     pincode?: string;
+    area?: string;
+    country?: string;
     landmark?: string;
+    location?: { lat: number; lng: number };
   };
   isActive?: boolean;
 };

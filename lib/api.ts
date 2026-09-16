@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/warehouse/register`,
   LOGOUT: `${API_BASE_URL}/warehouse/logout`,
   CURRENT_USER: `${API_BASE_URL}/warehouse/me`,
+  UPDATE_PROFILE: `${API_BASE_URL}/warehouse/profile`,
 
 // inventory transfer
   GET_INVENTORY_TRANSFER_REQUESTS: `${API_BASE_URL}/inventoryTransfer/list`,

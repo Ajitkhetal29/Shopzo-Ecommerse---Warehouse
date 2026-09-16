@@ -218,6 +218,13 @@ export default function AppShell({ children, menuItems, warehouse, brandHref, on
                     <p className="truncate text-xs text-shop-muted">{warehouse.contactNumber}</p>
                   ) : null}
                 </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setProfileOpen(false)}
+                  className="mt-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-foreground transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  Profile
+                </Link>
                 <button
                   type="button"
                   onClick={() => {
@@ -262,6 +269,7 @@ function NavIcon({ href, label, active }: { href: string; label: string; active:
   if (lower.includes("history") || href.includes("/activity")) return <IconChart className={c} />;
   if (label.toLowerCase().includes("transfer") && label.toLowerCase().includes("inventory"))
     return <IconArrows className={c} />;
+  if (lower.includes("profile")) return <IconUsers className={c} />;
   return <IconCircle className={c} />;
 }
 
